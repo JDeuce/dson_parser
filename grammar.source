@@ -1,0 +1,117 @@
+DSON_text
+  = ws value:value ws { return value; }
+
+begin_array     = ws "so" ws
+end_array       = ws "many" ws
+
+begin_object    = ws "such" ws
+end_object      = ws "wow" ws
+
+name_separator  = ws "is" ws
+
+value_separator = ws ( "and" / "also" ) ws
+obj_value_separator = ws ( "," / "." / "!" / "?" ) ws
+
+ws "whitespace" = [ \t\n\r]*
+
+/* ----- 3. Values ----- */
+
+value
+  = false
+  / null
+  / true
+  / object
+  / array
+  / number
+  / string
+
+false = "no" { return false; }
+null  = "empty"  { return null;  }
+true  = "yes"  { return true;  }
+
+/* ----- 4. Objects ----- */
+
+object
+  = begin_object
+    members:(
+      first:member
+      rest:(obj_value_separator m:member { return m; })*
+      {
+        var result = {}, i;
+
+        result[first.name] = first.value;
+
+        for (i = 0; i < rest.length; i++) {
+          result[rest[i].name] = rest[i].value;
+        }
+
+        return result;
+      }
+    )?
+    end_object
+    { return members !== null ? members: {}; }
+
+member
+  = name:string name_separator value:value {
+      return { name: name, value: value };
+    }
+
+/* ----- 5. Arrays ----- */
+
+array
+  = begin_array
+    values:(
+      first:value
+      rest:(value_separator v:value { return v; })*
+      { return [first].concat(rest); }
+    )?
+    end_array
+    { return values !== null ? values : []; }
+
+/* ----- 6. Numbers ----- */
+
+number "number"
+  = minus? int frac? exp? { return parseFloat(text().replace("very", "e").replace("VERY", "e")); }
+
+decimal_point = "."
+digit1_9      = [1-9]
+e             = "very" / "VERY"
+exp           = e (minus / plus)? DIGIT+
+frac          = decimal_point DIGIT+
+int           = zero / (digit1_9 DIGIT*)
+minus         = "-"
+plus          = "+"
+zero          = "0"
+
+/* ----- 7. Strings ----- */
+
+string "string"
+  = quotation_mark chars:char* quotation_mark { return chars.join(""); }
+
+char
+  = unescaped
+  / escape
+    sequence:(
+        '"'
+      / "\\"
+      / "/"
+      / "b" { return "\b"; }
+      / "f" { return "\f"; }
+      / "n" { return "\n"; }
+      / "r" { return "\r"; }
+      / "t" { return "\t"; }
+      / "u" digits:$(HEXDIG HEXDIG HEXDIG HEXDIG) {
+          return String.fromCharCode(parseInt(digits, 16));
+        }
+    )
+    { return sequence; }
+
+escape         = "\\"
+quotation_mark = '"'
+unescaped      = [\x20-\x21\x23-\x5B\x5D-\u10FFFF]
+
+/* ----- Core ABNF Rules ----- */
+
+/* See RFC 4234, Appendix B (http://tools.ietf.org/html/rfc4627). */
+DIGIT  = [0-9]
+HEXDIG = [0-9a-f]i
