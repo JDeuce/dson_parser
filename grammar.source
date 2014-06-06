@@ -1,3 +1,8 @@
+/*
+    This is based on javascript.pegjs in the examples for pegjs
+    See: https://github.com/dmajda/pegjs/blob/master/examples/javascript.pegjs
+*/
+
 DSON_text
   = ws value:value ws { return value; }
 
