@@ -1,9 +1,8 @@
 What Is It
 ==========
-Javascript implementation of DOGEON/DSON
-parsing following the document at http://dogeon.org/
-and using PEGjs (http://pegjs.majda.cz/)
+Javascript implementation of [DSON](https://github.com/dogescript/DSON) using [PEGjs](http://pegjs.majda.cz/).
 
+Doge Serialized Object Notation (or DSON, previously DogeON) is a data-interchange format that is easy to read and write for Shiba Inu dogs. It strives to replace JSON and XML as the major players in terms of intercommunication between a wide range of services for Shiba Inus and other doge breeds alike.
 
 Show me how it works
 ====================
