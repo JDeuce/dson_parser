@@ -1,19 +1,18 @@
 /*
     This is based on javascript.pegjs in the examples for pegjs
-    See: https://github.com/dmajda/pegjs/blob/master/examples/javascript.pegjs
+    See: https://github.com/dmajda/pegjs/blob/master/examples/json.pegjs
 */
+
+/* ----- 2. DSON Grammar ----- */
 
 DSON_text
   = ws value:value ws { return value; }
 
 begin_array     = ws "so" ws
 end_array       = ws "many" ws
-
 begin_object    = ws "such" ws
 end_object      = ws "wow" ws
-
 name_separator  = ws "is" ws
-
 value_separator = ws ( "and" / "also" ) ws
 obj_value_separator = ws ( "," / "." / "!" / "?" ) ws
 
@@ -39,15 +38,15 @@ true  = "yes"  { return true;  }
 object
   = begin_object
     members:(
-      first:member
-      rest:(obj_value_separator m:member { return m; })*
+      head:member
+      tail:(obj_value_separator m:member { return m; })*
       {
         var result = {}, i;
 
-        result[first.name] = first.value;
+        result[head.name] = head.value;
 
-        for (i = 0; i < rest.length; i++) {
-          result[rest[i].name] = rest[i].value;
+        for (i = 0; i < tail.length; i++) {
+          result[tail[i].name] = tail[i].value;
         }
 
         return result;
@@ -66,9 +65,9 @@ member
 array
   = begin_array
     values:(
-      first:value
-      rest:(value_separator v:value { return v; })*
-      { return [first].concat(rest); }
+      head:value
+      tail:(value_separator v:value { return v; })*
+      { return [head].concat(tail); }
     )?
     end_array
     { return values !== null ? values : []; }
@@ -76,14 +75,14 @@ array
 /* ----- 6. Numbers ----- */
 
 number "number"
-  = minus? int frac? exp? { return parseFloat(text().replace("very", "e").replace("VERY", "e")); }
+  = minus? int frac? exp? { return parseInt(parseFloat(text().replace("very", "e").replace("VERY", "e")), 8); }
 
 decimal_point = "."
-digit1_9      = [1-9]
+digit1_7      = [1-7]
 e             = "very" / "VERY"
 exp           = e (minus / plus)? DIGIT+
 frac          = decimal_point DIGIT+
-int           = zero / (digit1_9 DIGIT*)
+int           = zero / (digit1_7 DIGIT*)
 minus         = "-"
 plus          = "+"
 zero          = "0"
@@ -113,7 +112,7 @@ char
 
 escape         = "\\"
 quotation_mark = '"'
-unescaped      = [\x20-\x21\x23-\x5B\x5D-\u10FFFF]
+unescaped      = [^\0-\x1F\x22\x5C]
 
 /* ----- Core ABNF Rules ----- */
 

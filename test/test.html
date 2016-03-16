@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>DSON</title>
+    <script type="text/javascript" src="../dist/dson.js"></script>
+  </head>
+
+  <body>
+    <h2>DSON</h2>
+    <textarea id="dson" rows="10" cols="80">such "foo" is so "bar" also "baz" and "fizzbuzz" many wow</textarea> <br/>
+    <button onclick="run_dson()">Parse</button>
+    <br />
+    <div id="error" style="color: red"></div>
+    <br />
+
+    <h2>JSON</h2>
+    <textarea id="json" rows="10" cols="80"></textarea> <br/>
+    <button onclick="run_json()">Parse</button>
+
+  </body>
+
+  <script>
+    var edson = document.getElementById("dson");
+    var ejson = document.getElementById("json");
+    var eerror = document.getElementById("error");
+
+    function run(ein, eout, methodin, methodout) {
+      var v = ein.value;
+      try {
+        var result = methodin(v);
+        eerror.innerText = "";
+        eout.value = methodout(result);
+      } catch(e) {
+        eerror.innerText = e;
+        eout.value = "";
+      }
+    }
+
+    var run_dson = run.bind(run, edson, ejson, DSON.parse, JSON.stringify);
+    var run_json = run.bind(run, ejson, edson, JSON.parse, DSON.stringify);
+
+    run_dson();
+  </script>
+</html>
