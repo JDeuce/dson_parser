@@ -48,27 +48,27 @@ Or backwards:
 ## Making the dist files
 
     $ make
-    ./node_modules/.bin/webpack src/entry.js dist/dson.js
+    webpack src/entry.js dist/dson.js
     Hash: d1e572f8a950cc6d23b6
     Version: webpack 1.12.14
     Time: 1818ms
       Asset     Size  Chunks             Chunk Names
     dson.js  85.8 kB       0  [emitted]  main
         + 3 hidden modules
-    ./node_modules/.bin/uglifyjs dist/dson.js > dist/dson.min.js
+    uglifyjs dist/dson.js > dist/dson.min.js
 
 
 ## Running the tests
 
     $ make test
-    ./node_modules/.bin/webpack --target node test/tests.js dist/test.js
+    webpack --target node test/tests.js dist/test.js
     Hash: 25d099fd564253a6cdef
     Version: webpack 1.12.14
     Time: 2013ms
       Asset     Size  Chunks             Chunk Names
     test.js  87.7 kB       0  [emitted]  main
         + 5 hidden modules
-    ./node_modules/.bin/mocha dist/test.js
+    mocha dist/test.js
 
 
       DSON
